@@ -1,4 +1,4 @@
-# MCP Proxy
+# Open MCP Proxy
 
 An open source proxy for MCP servers.
 
