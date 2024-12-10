@@ -29,11 +29,7 @@ def main():
     os.environ["LOGFIRE_API_URL"] = "https://logfire-api.pydantic.dev"
 
     # Configure logging
-    logfire.configure(
-        service_name="omproxy",
-        service_version="0.1.0",
-        console=False
-    )
+    logfire.configure(service_name="omproxy", service_version="0.1.0", console=False)
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
 
     logfire.info("starting_proxy", command=args.command)
