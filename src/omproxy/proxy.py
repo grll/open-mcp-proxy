@@ -173,13 +173,13 @@ class Proxy:
         # First close the anyio streams (which will close their underlying file objects)
         await self.process_stdin.aclose()
         await self.process_stdout.aclose()
-        
+
         # Close memory streams (both ends)
         await self.read_stream_writer.aclose()
         await self.read_stream.aclose()
         await self.write_stream.aclose()
         await self.write_stream_reader.aclose()
-        
+
         # Close our unused raw file descriptors
-        os.close(self.stdin_read_fd)   # Close subprocess's reading end
-        os.close(self.stdout_write_fd) # Close subprocess's writing end
+        os.close(self.stdin_read_fd)  # Close subprocess's reading end
+        os.close(self.stdout_write_fd)  # Close subprocess's writing end

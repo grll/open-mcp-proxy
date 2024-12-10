@@ -10,9 +10,15 @@ from .proxy import Proxy
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Bidirectional proxy for subprocess communication")
-    parser.add_argument("-v", "--verbose", action="store_true", help="Enable debug logging")
-    parser.add_argument("command", nargs="+", help="Command to run with optional arguments")
+    parser = argparse.ArgumentParser(
+        description="Bidirectional proxy for subprocess communication"
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Enable debug logging"
+    )
+    parser.add_argument(
+        "command", nargs="+", help="Command to run with optional arguments"
+    )
     args = parser.parse_args()
 
     # Configure logging
@@ -20,6 +26,7 @@ def main():
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
 
     logfire.info("starting_proxy", command=args.command)
+
     async def run_proxy():
         async with Proxy(
             lambda line: logfire.info("on_stdin_cb", line=line),
