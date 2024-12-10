@@ -19,6 +19,7 @@ def main():
     logfire.configure(service_name="iod_proxy", service_version="0.1.0", console=False)
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
 
+    logfire.info("starting_proxy", command=args.command)
     async def run_proxy():
         async with Proxy(
             lambda line: logfire.info("on_stdin_cb", line=line),
