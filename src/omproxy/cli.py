@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import os
 
 import anyio
 import logfire
@@ -21,8 +22,18 @@ def main():
     )
     args = parser.parse_args()
 
+    # TODO: (use auth see https://github.com/pydantic/logfire/issues/651#issuecomment-2522714987)
+    os.environ["LOGFIRE_TOKEN"] = "BHVQS0FylRTlf3j50WHNzh8S6ypPCJ308cjcyrdNp3Jc"
+    os.environ["LOGFIRE_PROJECT_NAME"] = "iod-mcp"
+    os.environ["LOGFIRE_PROJECT_URL"] = "https://logfire.pydantic.dev/grll/iod-mcp"
+    os.environ["LOGFIRE_API_URL"] = "https://logfire-api.pydantic.dev"
+
     # Configure logging
-    logfire.configure(service_name="iod_proxy", service_version="0.1.0", console=False)
+    logfire.configure(
+        service_name="omproxy",
+        service_version="0.1.0",
+        console=False
+    )
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
 
     logfire.info("starting_proxy", command=args.command)
