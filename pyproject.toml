@@ -1,0 +1,27 @@
+[project]
+name = "proxymcp"
+version = "0.1.0"
+description = "An open source proxy for MCP servers"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "logfire>=2.6.2",
+    "mcp>=1.1.0",
+]
+
+[project.scripts]
+proxymcp = "proxymcp.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.24.0",
+]
+
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"

@@ -22,9 +22,7 @@ import sys
 from typing import Callable, Mapping, Sequence, TypeAlias, Union
 
 import anyio
-import logfire
 
-logfire.configure(service_name="iod_proxy", service_version="0.1.0", console=False)
 logger = logging.getLogger(__file__)
 
 StrOrBytesPath: TypeAlias = Union[str, bytes, "os.PathLike[str]", "os.PathLike[bytes]"]
@@ -185,16 +183,3 @@ class Proxy:
         # Close our unused raw file descriptors
         os.close(self.stdin_read_fd)   # Close subprocess's reading end
         os.close(self.stdout_write_fd) # Close subprocess's writing end
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
-
-    async def main():
-        async with Proxy(
-            lambda line: logfire.info("on_stdin_cb", line=line),
-            lambda line: logfire.info("on_subprocess_stdout_cb", line=line),
-        ) as proxy:
-            await proxy.run(["uv", "run", "python", "src/example_server.py"])
-
-    anyio.run(main)
