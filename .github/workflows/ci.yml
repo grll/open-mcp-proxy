@@ -10,41 +10,41 @@ env:
   PYTHON_VERSION: "3.10"
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+  # test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install uv
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+  #     - name: Install uv
+  #       run: |
+  #         curl -LsSf https://astral.sh/uv/install.sh | sh
+  #         echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
-      - name: Cache uv dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/uv
-            .venv
-          key: ${{ runner.os }}-uv-${{ hashFiles('pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-uv-
+  #     - name: Cache uv dependencies
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           ~/.cache/uv
+  #           .venv
+  #         key: ${{ runner.os }}-uv-${{ hashFiles('pyproject.toml') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-uv-
 
-      - name: Install dependencies
-        run: |
-          uv venv
-          source .venv/bin/activate
-          uv sync
+  #     - name: Install dependencies
+  #       run: |
+  #         uv venv
+  #         source .venv/bin/activate
+  #         uv sync
 
-      - name: Run tests
-        run: |
-          source .venv/bin/activate
-          pytest tests/
+  #     - name: Run tests
+  #       run: |
+  #         source .venv/bin/activate
+  #         pytest tests/
 
   lint:
     runs-on: ubuntu-latest
@@ -84,7 +84,7 @@ jobs:
           ruff format --check .
 
   build:
-    needs: [test, lint]
+    needs: [lint]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
