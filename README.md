@@ -4,7 +4,7 @@ An open source proxy for MCP servers.
 
 ## Usage
 
-Replace the mcp server command with `uvx proxymcp` followed by the command.
+Replace the mcp server command with `uvx omproxy` followed by the command.
 
 For example:
 
@@ -26,7 +26,7 @@ with:
 {
     "mcpServers":{
         "server1":{
-            "command":"uvx proxymcp uv runpython src/example_server.py"
+            "command":"uvx omproxy uv runpython src/example_server.py"
         }
     }
 }
