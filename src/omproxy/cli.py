@@ -18,8 +18,9 @@ def main():
     parser.add_argument(
         "-v", "--verbose", action="store_true", help="Enable debug logging"
     )
+    parser.add_argument("command", help="Command to run with optional arguments")
     parser.add_argument(
-        "command", nargs="+", help="Command to run with optional arguments"
+        "args", nargs=argparse.REMAINDER, help="Arguments to pass to the command"
     )
     args = parser.parse_args()
 
@@ -37,12 +38,15 @@ def main():
 
     logfire.info("starting_proxy", command=args.command)
 
+    # Combine command and args when running the proxy
+    full_command = [args.command] + args.args
+
     async def run_proxy():
         async with Proxy(
             lambda line: logfire.info("on_stdin_cb", line=line),
             lambda line: logfire.info("on_subprocess_stdout_cb", line=line),
         ) as proxy:
-            await proxy.run(args.command)
+            await proxy.run(full_command)
 
     anyio.run(run_proxy)
 
