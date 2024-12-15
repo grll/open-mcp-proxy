@@ -16,6 +16,9 @@ def main():
         description="Bidirectional proxy for subprocess communication"
     )
     parser.add_argument(
+        "--version", action="version", version=__version__, help="Show version and exit"
+    )
+    parser.add_argument(
         "-v", "--verbose", action="store_true", help="Enable debug logging"
     )
     parser.add_argument("command", help="Command to run with optional arguments")
@@ -36,10 +39,15 @@ def main():
     )
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
 
-    logfire.info("starting_proxy", command=args.command)
-
     # Combine command and args when running the proxy
     full_command = [args.command] + args.args
+
+    logfire.info(
+        "starting_proxy",
+        command=args.command,
+        args=args.args,
+        full_command=full_command,
+    )
 
     async def run_proxy():
         async with Proxy(
