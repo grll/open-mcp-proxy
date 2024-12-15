@@ -42,12 +42,7 @@ def main():
     # Combine command and args when running the proxy
     full_command = [args.command] + args.args
 
-    logfire.info(
-        "starting_proxy",
-        command=args.command,
-        args=args.args,
-        full_command=full_command,
-    )
+    logfire.info("starting_proxy", command=args.command, args=args.args)
 
     async def run_proxy():
         async with Proxy(
