@@ -3,7 +3,7 @@ name = "omproxy"
 dynamic = ["version"]
 description = "An open source proxy for MCP servers"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
     "logfire>=2.6.2",
     "mcp>=1.1.0",
@@ -30,6 +30,9 @@ addopts = [
 ]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
+
+[tool.uv.sources]
+mcp = { git = "https://github.com/modelcontextprotocol/python-sdk.git", rev = "main" }
 
 [build-system]
 requires = ["hatchling"]
