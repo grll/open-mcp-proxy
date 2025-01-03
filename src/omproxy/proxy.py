@@ -193,7 +193,6 @@ class SseProxy(Proxy):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG, stream=sys.stderr)
 
-    # define end MCP server parameters
     # stdio example
     proxy = StdioProxy()
     proxy.run(
