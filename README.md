@@ -1,68 +1,91 @@
 # Open MCP Proxy
 
-An open source proxy for MCP servers.
+A simple and lightweight open-source bidirectional proxy for MCP servers.
+
+It exposes several callbacks that you can use to implement your own logic and do your own actions during the MCP protocol lifecycle.
+
+It supports both SSE and STDIO protocols so it can be used to enable MCP Client supporting only stdio (like the Claude Desktop App) to also support SSE.
+
+It leverages as much as possible the official mcp-python-sdk to remains simple, lightweight and future-proof.
+
+it declines in 2 versions to support both SSE and STDIO protocols:
+
+**SSE Proxy**
+
+```mermaid
+graph LR
+    STDIN -->|stdio| Proxy[Open MCP Proxy]
+    Proxy -->|SSE| Server[Remote MCP Server]
+```
+
+```mermaid
+graph RL
+    Server[Remote MCP Server] -->|SSE| Proxy[Open MCP Proxy]
+    Proxy -->|stdio| STDOUT
+```
+
+**STDIO Proxy**
+
+```mermaid
+graph LR
+    STDIN -->|stdio| Proxy[Open MCP Proxy]
+    Proxy -->|stdio| Server[Local MCP Server]
+```
+
+```mermaid
+graph RL
+    Server[Local MCP Server] -->|stdio| Proxy[Open MCP Proxy]
+    Proxy -->|stdio| STDOUT
+```
+
+Note that in both cases the proxy listen to STDIN and write to STDOUT to work seemlessly with stdio MCP Clients.
 
 ## Usage
 
-Replace the mcp server command with `uvx omproxy@latest` followed by the command.
+### Hook into the MCP protocol lifecycle
 
-For example:
+The recommended approach to hook into the MCP protocol lifecycle is to subclass one of the Proxy class that we expose and override the callback methods you need.
 
-replace:
+At the moment, we expose 4 callback methods:
 
-```json
-{
-    "mcpServers":{
-        "server1":{
-            "command":"uv"
-            "args": ["run", "src/example_server.py"]
-        }
-    }
-}
+| Method | Description | Parameters |
+|--------|-------------|------------|
+| `_on_mcp_client_message` | Can be used to handle messages from the MCP client | `message: JSONRPCMessage` |
+| `_on_mcp_server_message` | Can be used to handle messages from the MCP server | `message: JSONRPCMessage \| Exception` |
+| `_on_start` | Can be used to handle the start of the proxy | None |
+| `_on_close` | Can be used to handle the close of the proxy | None |
+
+For example if you need a proxy over the stdio protocol:
+
+```python
+from omproxy.proxy import StdioProxy
+
+class MyStdioProxy(StdioProxy):
+    def _on_start(self):
+        print("Starting proxy", file=sys.stderr)
+
+    def _on_mcp_client_message(self, message: JSONRPCMessage):
+        print(message, file=sys.stderr)
+
+    def _on_mcp_server_message(self, message: JSONRPCMessage | Exception):
+        print(message, file=sys.stderr)
+
+    def _on_close(self):
+        print("Closing proxy", file=sys.stderr)
+
+if __name__ == "__main__":
+    proxy = MyStdioProxy()
+    proxy.run(StdioServerParameters(command="uv", args=["run", "src/example_server.py"]))
 ```
 
-with:
+**tip**: dont write to stdout in your callbacks or anywhere really as it will mess with the stdio MCP communication.
 
-```json
-{
-    "mcpServers":{
-        "server1":{
-            "command": "uvx",
-            "args": [
-                "--python",
-                "3.12",
-                "omproxy@latest",
-                "--name",
-                "example_server",
-                "uv",
-                "run",
-                "src/example_server.py"
-            ]
-        }
-    }
-}
+### MCP Client supporting only STDIO to your SSE MCP Server
+
+We provide a simple CLI to start the proxy if you have an SSE MCP server running and you want to make it available to an MCP Client supporting only stdio you can simply do:
+
+```bash
+uvx omproxy@latest sse --url https://yourssemcpserver.io
 ```
 
-## Telemetry Data Collection and Handling
-
-We collect anonymous telemetry data of MCP server running through the proxy.
-
-The information collected help us:
-
-* display lively health status of MCP servers on our website: https://iod.ai
-* troubleshoot MCP servers, take them out and report issues to corresponding MCP server owner repository.
-* aggregate usage metric to display information such as the most used MCP servers, or the most used tool for a given MCP server.
-
-We collect the minimal amount of data to support the use cases above. In practice it means that we collect:
-* 1 anonymous event everytime the proxy is started
-* 1 anonymous event everytime a 'call_tool' is made containing the name of the tool and the arguments passed to the tool.
-* 1 anonymous event everytime a 'resource' is accessed containing the uri accessed but not the content of the resource.
-
-Note: for tool use and resource we do store access or log the response in any way.
-
-All the data collected is anonymous we use OpenTelemetry the open source standard for collecting telemetry data through logfire (the observability framework by the pydantic team).
-
-Your anonymous data is stored by logfire for a period of 30 days as per logfire retention policy.
-
-
-
+see `uvx omproxy@latest sse --help` for more information including setting headers for authorization for example.
